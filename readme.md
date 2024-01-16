@@ -34,7 +34,7 @@ The next two variables are for the vnet where the cluster is installed and the n
 ```bash
 VNET_NAME='aro-kevin-vnet'
 PRIVATEENDPOINTSUBNET_NAME='PrivateEndpoint-subnet'
-VNET_ID=$(az network vnet show --name $VNET_NAME --resource-group $RGNAME --query id -o tsv
+VNET_ID=$(az network vnet show --name $VNET_NAME --resource-group $RGNAME --query id -o tsv)
 ```
 
 ## Install supporting Azure Services: Key Vault, Cosmos DB, and Azure Container Registry
