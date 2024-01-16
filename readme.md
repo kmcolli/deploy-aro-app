@@ -325,8 +325,11 @@ Set your GitHub Name
 GIT_NAME=<YOUR GIT ID>
 ```
 
+```bash
 git clone https://github.com/$GIT_NAME/mslearn-aks-workshop-ratings-api.git
+
 git clone https://github.com/$GIT_NAME/mslearn-aks-workshop-ratings-web.git
+```
 
 ### Manually building and pushing to ACR
 
