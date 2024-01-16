@@ -233,11 +233,12 @@ helm install csi csi-secrets-store-provider-azure/csi-secrets-store-provider-azu
 Create a service principal to access keyvault
 
 ```bash
-SERVICE_PRINCIPAL_NAME="fta-aro-akv-sp"
+
+SERVICE_PRINCIPAL_NAME="fta-aro-akv-sp-"$RANDOM
 
 SERVICE_PRINCIPAL_CLIENT_SECRET="$(az ad sp create-for-rbac --skip-assignment --name $SERVICE_PRINCIPAL_NAME --query 'password' -o tsv)"
 
-SERVICE_PRINCIPAL_CLIENT_ID="$(az ad sp list --display-name fta-aro-akv-sp --query '[0].appId' -o tsv)"
+SERVICE_PRINCIPAL_CLIENT_ID="$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query '[0].appId' -o tsv)"
 
 az keyvault set-policy -n $KV_NAME --secret-permissions get --spn ${SERVICE_PRINCIPAL_CLIENT_ID}
 ```
@@ -331,9 +332,6 @@ git clone https://github.com/$GIT_NAME/mslearn-aks-workshop-ratings-web.git
 
 >Important: you must be connected to the private network of your VNet or you will need to allow your IP Address in the ACR Firewall settings from the Azure Portal.
 
- **********TO Do*******************
- change docker to podman
- **********************************
 
 ```bash
 az acr login -n $ACR_NAME
@@ -350,9 +348,6 @@ docker push "$ACR_NAME.azurecr.io/ratings-api:latest"
 
 cd ..
 ```
-**********TO Do*******************
- figure our why docker build fails
- **********************************
 
 Build out the mslearn aks workshop ratings web application
 
