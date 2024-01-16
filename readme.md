@@ -309,7 +309,7 @@ oc get scc privileged -ojson | \
 
 oc apply -f privileged-csi-custom.json
 
-oc adm add-scc-to-user privileged-csi-custom -z default
+oc adm policy add-scc-to-user privileged-csi-custom -z default
 ```
 
 ### Deploy the application
