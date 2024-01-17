@@ -368,6 +368,7 @@ cd ..
 
 update the deployment files:
 mslearn-aks-workshop-ratings-web/deploy/ratings-web-deployment.yaml
+
 mslearn-aks-workshop-ratings-api/deploy/api-deployment.yaml
 
 Change the above two deployment files to point to your ACR instance:
@@ -385,7 +386,12 @@ oc apply -f mslearn-aks-workshop-ratings-web/deploy/ratings-web-deployment.yaml
 ```
 
 ### Auto deploy with OpenShift Pipelines
-Rather than manually applying manifest files to deploy an application, OpenShift offers a number of build-in devops tools to automation the provisioning of applications.  OpenShift Pipelines ( based on Tekton ) is one of these devops tools that is included with OpenShift.  One of the features of OpenShift Pipelins is the concept of pipelines as code where we will develop and store our configuration files in the git repository of our applicaiton.  
+Rather than manually applying manifest files to deploy an application, OpenShift offers a number of build-in devops tools to automation the provisioning of applications.  OpenShift Pipelines ( based on Tekton ) is one of these devops tools that is included with OpenShift.  One of the features of OpenShift Pipelins is the concept of pipelines as code where we will develop and store our configuration files in the git repository of our applicaiton.
+
+Let's first setup Red Hat OpenShift Pipelines Operator using OperatorHub. 
+In OperatorHub serach "OpenShift Pipelines Operator" and install it with default settings
+
+![Alt text](RedHatOpenShiftPipelinesOperator.png "Red Hat OpenShift Pipelines")
 
 Link the pipeline service account to the acr secret that contains the credendials for azure container registry.
 
@@ -415,32 +421,35 @@ EOF
 
 ### Create a pipeline for the API application
 
-The git repository for the API application has a folder named .tekton that stores the definition of our pipeline, pipeline tasks and triggers that will be used to deploy the API application.   The pipeline we are going to deploy is a relatively basic pipeline that includes three steps: clone the git repo, build the application, deploy the application to our ARO cluster.
+The git repository for the API application has a folder named .tekton that stores the definition of our pipeline, pipeline tasks and triggers that will be used to deploy the API application.  The pipeline we are going to deploy is a relatively basic pipeline that includes three steps: clone the git repo, build the application, deploy the application to our ARO cluster.
 
 ![Alt text](pipeline.png "Build and Deploy pipeline")
 
 As part of our application architecture, we will be using Azure Container Registry to store the container images.  To use ACR, we will need to update one of the tekton yaml files.
 
-Edit the mslearn-aks-workshop-ratings-api/.tekton/binding.yaml file and change the container-registry parameter to the name of your ACR instance.
+Edit the mslearn-aks-workshop-ratings-api/.tekton/triggers/binding.yaml file and change the container-registry parameter to the name of your ACR instance.
 
 ```bash
   - name: container-registry
     value: <ACR_NAME>.azurecr.io
 ```
 
-Next, review the files in the .tekton directory if you like:
+Next, review the files in the .tekton and .tekton/triggers directories if you like:
+
+```
 binding.yaml - contains settings, environment variables we will be using
 el-route.yaml - creates a route that will expose our event listener to git.
 event-listener - tekton eventlistener that will be listening for git events to kick off a pipeline run
 template.yaml - tekton trigger template that will be used as a template to kick off a pipeline run
 trigger.yaml - tekton trigger 
+```
 
 Apply the pipeline and trigger definitions
 
 ```bash
 oc apply -f mslearn-aks-workshop-ratings-api/.tekton -n ratingsapp
 
-oc apply -f mslearn-aks-workshop-ratings-api/.tekton/triggers - n ratingsapp
+oc apply -f mslearn-aks-workshop-ratings-api/.tekton/triggers -n ratingsapp
 ```
 
 From the OpenShift Console, slick on the Pipelines in the left navigation bar, and then click in the build-and-deploy pipeline and explore the resources that were just created.
@@ -451,7 +460,7 @@ Next, we need to configure a webhook in the forked gitrepo to push git events to
 Retrieve the hostname of the route we just created when apply the yaml files:
 
 ```bash
-oc get route el-ratings-api -o jsonpath='{"https://"}{.spec.host}{"\n"}'
+oc get route el-ratings-api -o jsonpath='{"http://"}{.spec.host}{"\n"}'
 ```
 
 Copy this value.
@@ -462,7 +471,7 @@ Open your forked git repository, and click on settings.
 Click on Webhooks
 Paste in the value you copied above for Payload URL
 Change the Content type to application/json
-Keep the remaining values and click Update Webhook
+Keep the remaining values and click Add or Update Webhook
 
 ![Alt text](webhook.png "Create a webhook")
 
