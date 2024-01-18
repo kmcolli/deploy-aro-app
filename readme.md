@@ -15,24 +15,28 @@ one for the ARO Workers
 one for the ARO Control Plane
 one for the Azure Private Link services
 An ARO Cluster 
+docker ( optional )
+az cli
+oc cli
+helm
 
 Please refer to this document in setting up a cluster with all the above prerequisisites.
 
 ## Set Envirnoment Variables
 
 ```bash
-RGNAME='kevin-aro-rg'
-LOCATION='eastus'
-AROCLUSTER='poc-kevin-cluster'
-ACR_NAME='kevin1acr'
-COSMOSDB_NAME='kevincosmos'
-KV_NAME='kevinvault'
+RGNAME='<Resource Group Name used by your ARO Cluster>'
+LOCATION='<Azure location of you ARO cluster i.e. eastus>'
+AROCLUSTER='<ARO Cluster name>'
+ACR_NAME='<name of a newly to be created ACR instance - note the name must be unique across azure>'
+COSMOSDB_NAME='<name of a newly to be created CosmosDB instance>'
+KV_NAME='<name of a newly to be be created instance of key vault>'
 ```
 
 The next two variables are for the vnet where the cluster is installed and the name of the subnet that will used for the private endpoints.
 
 ```bash
-VNET_NAME='aro-kevin-vnet'
+VNET_NAME='<name of a vnet being used by ARO>'
 PRIVATEENDPOINTSUBNET_NAME='PrivateEndpoint-subnet'
 VNET_ID=$(az network vnet show --name $VNET_NAME --resource-group $RGNAME --query id -o tsv)
 ```
@@ -316,8 +320,12 @@ oc adm policy add-scc-to-user privileged-csi-custom -z default
 ### Deploy the application
 
 Fork the following GitHub repos to your GitHub account
+
+```bash
 https://github.com/kmcolli/mslearn-aks-workshop-ratings-api.git
+
 https://github.com/kmcolli/mslearn-aks-workshop-ratings-web.git
+```
 
 Set your GitHub Name
 
